@@ -1,17 +1,17 @@
 import ProductList from '@/components/shared/product/product-list'
-import sampleData from '@/lib/sample-data'
-import { Product } from '@/types'
+import { getLatestProducts } from '@/lib/actions/product.actions'
+import { APP_DESCRIPTION, APP_NAME } from '@/lib/constants'
+import { Metadata } from 'next'
 
-export default function Home() {
-  const validatedProducts: Product[] = sampleData.products.map((product) => ({
-    ...product,
-    isFeatured: product.isFeatured ?? false,
-  }))
+export const metadata: Metadata = {
+  title: `${APP_NAME} - ${APP_DESCRIPTION}`,
+}
 
+export default async function Home() {
+  const latestProducts = await getLatestProducts()
   return (
     <div className="space-y-8">
-      <h2 className="h2-bold">Latest Products</h2>
-      <ProductList data={validatedProducts} />
+      <ProductList title="Newest Arrivals" data={latestProducts} />
     </div>
   )
 }
