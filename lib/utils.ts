@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-// @typescript-eslint/no-explicit-any
+
 export const formatError = (error: any): string => {
   if (error.name === 'ZodError') {
     const fieldErrors = Object.keys(error.errors).map((field) => {
