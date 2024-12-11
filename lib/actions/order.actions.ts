@@ -6,7 +6,7 @@ import { getUserById } from './user.actions'
 import { redirect } from 'next/navigation'
 import { insertOrderSchema } from '../validator'
 import db from '@/db/drizzle'
-import { carts, orderItems, orders } from '@/db/schema'
+import { carts, orderItems, orders, products } from '@/db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { isRedirectError } from 'next/dist/client/components/redirect'
 import { formatError } from '../utils'
@@ -24,7 +24,7 @@ export const createOrder = async () => {
 
     const order = insertOrderSchema.parse({
       userId: user.id,
-      shippingAddress: user.address,
+      shippingAddress: JSON.stringify(user.address),
       paymentMethod: user.paymentMethod,
       itemsPrice: cart.itemsPrice,
       shippingPrice: cart.shippingPrice,
@@ -46,6 +46,18 @@ export const createOrder = async () => {
         .returning({ id: orders.id })
 
       for (const item of cart.items) {
+        const productExists = await tx
+          .select()
+          .from(products)
+          .where(eq(products.id, item.productId))
+          .limit(1)
+
+        if (!productExists.length) {
+          throw new Error(
+            `죄송합니다. 장바구니의 일부 상품이 더 이상 존재하지 않습니다. 장바구니를 다시 확인해주세요.`
+          )
+        }
+
         await tx.insert(orderItems).values({
           ...item,
           price: item.price.toFixed(2),

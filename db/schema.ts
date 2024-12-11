@@ -141,6 +141,7 @@ export const orders = pgTable('order', {
   deliveredAt: timestamp('deliveredAt'),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
 })
+
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   orderItems: many(orderItems),
   user: one(users, { fields: [orders.userId], references: [users.id] }),
